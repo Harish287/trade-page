@@ -1,0 +1,156 @@
+import React, { useEffect, useState,useRef } from 'react';
+import axios from 'axios';
+
+
+const App = () => {
+  const [filterlist, setFilterlist] = useState([]);
+
+  const [Data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [tab, setTab] = useState("inr");
+  const ClubRef = useRef(null);
+
+  const fetch = async () => {
+    try {
+      const response = await axios.get("https://demoback.kairaaexchange.com/api/v1/pair-list");
+      setData(response.data);  // assuming response.data is the JSON object
+    } catch (error) {
+      console.error('Error fetching  data:', error);
+      // Handle error state or retry mechanism here
+    }
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  if (!Data) {
+    return <div>Loading...</div>;
+  }
+
+
+
+  const updateTab = (e) => {
+    setTab(e);
+    // console.log(e);
+  };
+
+ 
+
+  const handleFilter = (e) => {
+    const value = (e.target.value || "").toLowerCase();
+
+    console.log(value);
+    const filteredMembers = Data.data.map((link) => {
+      const filtered = link.data.filter((data) =>
+        (data.user_id || "").toLowerCase().includes(value) ||
+        (data.user_name || "").toLowerCase().includes(value)
+      );
+      console.log(filtered);
+      // setCurrentPage(1);
+      // setsilverCurrentPage(1);
+      // setgoldCurrentPage(1);
+      return { ...link, members: filtered };
+    });
+    setFilterlist(filteredMembers);
+  };
+  return (
+
+    
+    <div className='mt-[20px]'>
+      <h1 className='text-center text-[50px] mb-9 font-bold' style={{ fontFamily: "Nunito, sans-serif" }}>Data </h1>
+      <div className="grid center w-[90%] m-auto grid-cols-1 gap-4 lg:grid lg:grid-cols-3 md:grid md:grid-cols-2 sm:grid sm:grid-cols-2 mt-[30px]">
+        {Data.data.map((e, i) => (
+            <div className='' key={i}>
+           <p> </p>
+                <p className='relative bg-white text-center' dangerouslySetInnerHTML={{ __html: e.data }}></p>
+             
+           
+          </div>
+        ))}
+      </div>
+
+
+
+      <h1 ref={ClubRef} className="flex justify-center text-xl font-bold mt-9 mb-9">Club</h1>
+      <div className=" md:flex md:justify-center container">
+        {" "}
+        <div className="md:flex px-0 md:px-28 gap-6 justify-center text-center">
+          {Data.data.map((link, index) => (
+            <>
+              <div>
+                <div
+                  key={link.id}
+                  onClick={() => updateTab(link.data)}
+                  className={`md:my-0 my-7 flex flex-col  hover:text-blue-500  ${tab === link.data ? " text-blue-500" : " text-black"
+                    } font-semibold hover:cursor-pointer  active:text-gray-400`}
+                >
+                  {link.data}
+                  <div
+                    className={`h-1 w-28 mx-auto bg-white hover:bg-white ${tab === link.data ? " bg-white" : " bg-white"
+                      }`}
+                  ></div>
+                </div>
+              </div>
+            </>
+          ))}
+        </div>
+        <form class="max-w-md ml-auto mr-[40px]">
+          <label
+            for="default-search"
+            class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+          >
+            Search
+          </label>
+          <div class="relative flex">
+            <div class=" inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <svg
+                class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+            </div>
+            <input
+              type="search"
+              id="search"
+              className="block w-full p-1 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              onChange={handleFilter}
+              placeholder="Search user ID"
+              required
+            />
+          </div>
+        </form>
+      </div>
+
+      <div className="  w-[100%]">
+        {(filterlist.length > 0 ? filterlist : Data.data).map((link, index) => (
+          <div className="" key={link.id}>
+            {tab === "inr" && link.secondcurrency === "inr" 
+            //  (<Clubbronze e={link} goToNextPage={goToNextPage} currentPage={currentPage} setCurrentPage={setCurrentPage} goToPrevPage={goToPrevPage} /> )
+              }
+
+            {/* {tab === "silver" && link.data === "silver" 
+            }
+
+            {tab === "gold" && link.club === "gold" } */}
+
+          
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default App;

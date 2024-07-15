@@ -5,6 +5,7 @@ import App from "./App";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./routes/root";
 import ErrorPage from "./routes/root";
+import Socket from "./socket.jsx"
 
 
 
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <App />,
+      },
+      {
+        path: "/Socket",
+        element: <Socket />,
       },
 
     ],
